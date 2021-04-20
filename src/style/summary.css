@@ -1,0 +1,46 @@
+h1 {
+  font-weight: bold;
+  margin: 0;
+}
+.summarywrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.summary-box {
+  padding: 10px;
+
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  width: 55vw;
+  height: 40vh;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 4px 8px 8px 4px silver;
+}
+.summary-box-top {
+  display: flex;
+  height: 50%;
+  width: 100%;
+  border-bottom: 1px solid silver;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+.summary-box-buttom {
+  display: flex;
+  height: 50%;
+  width: 100%;
+}
+.summary-block1 {
+  width: 33.33%;
+  height: 100%;
+}
+
+.summary-block {
+  width: 33.33%;
+  height: 100%;
+  border-left: 1px solid silver;
+}

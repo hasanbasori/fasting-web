@@ -1,7 +1,14 @@
-import React from "react";
+import { Content, Header } from 'antd/lib/layout/layout'
+import React from 'react'
+import Layout from '../components/layout'
 
 function AboutUsPage() {
-  return <div>AboutUsPage</div>;
+  return (
+    <Layout>
+      <Header />
+      <Content>About Page</Content>
+    </Layout>
+  )
 }
 
-export default AboutUsPage;
+export default AboutUsPage

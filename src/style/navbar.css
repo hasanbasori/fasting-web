@@ -1,0 +1,22 @@
+.navbar {
+  background-color: orange;
+  width: 100%;
+  height: 12vh;
+  padding: 10px;
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  /* text-align: center; */
+  align-items: center;
+}
+.fasting-app {
+  color: whitesmoke;
+}
+
+.logoName {
+  display: flex;
+}
+
