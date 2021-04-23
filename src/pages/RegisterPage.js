@@ -282,9 +282,14 @@ function RegisterPage() {
                     </Upload>
                   </Form.Item>
                   <br />
-                  <Button type="primary" style={{ backgroundColor: '#319793' }}>
-                    <Link to="/homepage">Sign Up</Link>
-                  </Button>
+                  <Row justify="center">
+                    <Button
+                      type="primary"
+                      style={{ backgroundColor: '#319793' }}
+                    >
+                      <Link to="/homepage">Sign Up</Link>
+                    </Button>
+                  </Row>
                 </Form>
               </Row>
             </Col>

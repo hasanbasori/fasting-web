@@ -131,7 +131,7 @@ function VideoPostPage() {
   }
 
   return (
-    <Spin tip="รอแป๊บเดียว..." spinning={loading}>
+    <Spin tip="JUST MOMENT PLEASE..." spinning={loading}>
       <VideoPageWrapped>
         <Layout className="video-wrapper">
           <Header />
@@ -163,7 +163,7 @@ function VideoPostPage() {
                 >
                   <Form.Item
                     name="title"
-                    label="Tile"
+                    label="Title"
                     rules={[
                       {
                         required: true

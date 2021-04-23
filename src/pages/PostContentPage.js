@@ -238,7 +238,7 @@ function PostContentPage({}) {
   }
 
   return (
-    <Spin tip="รอแป๊บเดียว..." spinning={loading}>
+    <Spin tip="JUST MOMENT PLEASE..." spinning={loading}>
       <ContentPageWrapped>
         <Layout className="video-wrapper">
           <Header />

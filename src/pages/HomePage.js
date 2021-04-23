@@ -37,7 +37,7 @@ function HomePage() {
       <Content>
         <div className="greeting-user">
           <Title as="h2" size="xl">
-            Howdy!, User and welcome to our website.
+            Howdy!, Sun and welcome to our website.
           </Title>
         </div>
         <div className="reccomment-banner-wrap">

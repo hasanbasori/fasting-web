@@ -3,24 +3,46 @@ import '../style/fastingpage.css'
 import axios from 'axios'
 // import { Button, Select } from "@chakra-ui/react";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
-import { Button, Select } from 'antd'
+import { Button, Row, Select, Typography, Modal, DatePicker, Space } from 'antd'
 import Layout from '../components/layout'
 import Content from '../components/layout/Content'
 import Header from '../components/layout/Header'
+import 'react-circular-progressbar/dist/styles.css'
+import { calculatePercent, displayFastingTime } from '../utils/timing'
 
+import moment from 'moment'
+
+const { Title } = Typography
+
+const STATUS = {
+  IDLE: 'IDLE',
+  FASTING: 'FASTING'
+}
 function FastingPage() {
   const [startF, setStartF] = useState(false)
   const handleClick = () => setStartF(!startF)
+
   const [plans, setPlans] = useState([])
   const [fastingHrs, setFastingHrs] = useState(0)
-  const [remainingHrs, setRemainingHrs] = useState(fastingHrs)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [fastingStatus, setFastingStatus] = useState(STATUS.IDLE)
 
   //effect
   useEffect(() => {
     fetchPostContents()
   }, [])
 
-  console.log(remainingHrs)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fastingHrs &&
+        fastingStatus === STATUS.FASTING &&
+        setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  })
+
+  console.log(elapsedTime)
   async function fetchPostContents() {
     try {
       const { data } = await axios.get('http://localhost:8080/plans')
@@ -29,8 +51,29 @@ function FastingPage() {
       console.error(err?.response.data.message)
     }
   }
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
-  const percentage = 30
+  const showModal = () => {
+    setIsModalVisible(true)
+  }
+
+  const handleOk = () => {
+    setIsModalVisible(false)
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
+
+  function onChange(value, dateString) {
+    console.log('Selected Time: ', value)
+    console.log('Formatted Selected Time: ', dateString)
+  }
+
+  function onOk(value) {
+    console.log('onOk: ', value)
+  }
+
   return (
     <Layout>
       <Header />
@@ -45,7 +88,6 @@ function FastingPage() {
                   onChange={(value) => {
                     const selectedPlan = Number(value.split(/[ |\/]/)[0])
                     setFastingHrs(selectedPlan)
-                    setRemainingHrs(selectedPlan)
                   }}
                 >
                   {plans.map((plan) => {
@@ -57,14 +99,21 @@ function FastingPage() {
                   })}
                 </Select>
               </div>
-              <div className="timefasting">
+              <Row align="middle" className="timefasting">
                 <CircularProgressbar
-                  value={remainingHrs}
-                  text={`${remainingHrs}%`}
+                  value={
+                    fastingHrs
+                      ? calculatePercent(elapsedTime, fastingHrs * 60 * 60)
+                      : 0
+                  }
+                  text={displayFastingTime(
+                    fastingHrs && fastingStatus === STATUS.FASTING
+                      ? elapsedTime
+                      : 0
+                  )}
                   strokeWidth={15}
                   styles={buildStyles({
                     // Rotation of path and trail, in number of turns (0-1)
-                    rotation: 0.6,
                     width: '50px',
                     // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
                     strokeLinecap: 'round',
@@ -79,24 +128,57 @@ function FastingPage() {
                     // pathTransition: 'none',
 
                     // Colors
-                    pathColor: `rgba(255, 155, 30,${percentage / 100})`,
+                    pathColor: `rgba(255, 155, 30, 0.5)`,
                     textColor: '#000000',
                     trailColor: '#e3e3e3',
                     backgroundColor: '#3e98c7'
                   })}
                 />
-              </div>
+              </Row>
+              <Title level={4} style={{ minHeight: 24 }}>
+                {fastingHrs
+                  ? `${
+                      !fastingStatus ? 'Selected' : 'Fasting'
+                    } ${fastingHrs} Hours`
+                  : ''}
+              </Title>
 
               <div className="controlfasting">
-                <Button colorScheme="teal" onClick={handleClick}>
-                  {startF ? 'End fast' : 'Start fast'}
-                </Button>
-                <Button colorScheme="teal">Edit Fast</Button>
+                <Button
+                  colorScheme="teal"
+                  disabled={!fastingHrs}
+                  onClick={() => {
+                    setFastingStatus(
+                      fastingStatus === STATUS.IDLE
+                        ? STATUS.FASTING
+                        : STATUS.IDLE
+                    )
+                    fastingStatus === STATUS.IDLE && setElapsedTime(0)
+                  }}
+                >
+                  {fastingStatus === STATUS.IDLE ? 'Start fast' : 'End fast'}
+                </Button>{' '}
+                <Button
+                  disabled={!fastingHrs}
+                  colorScheme="teal"
+                  onClick={showModal}
+                >
+                  Edit Fast
+                </Button>{' '}
+                <br></br>start fast at 13:12:00
               </div>
             </div>
           </div>
         </div>
       </Content>
+      <Modal
+        title="EDIT FAST"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <DatePicker showTime onChange={onChange} onOk={onOk} />
+      </Modal>
     </Layout>
   )
 }

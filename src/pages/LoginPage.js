@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import { Row, Col, Button, Input, Form, Typography } from 'antd'
 import Logo from '../components/logo/Logo'
 import styled from 'styled-components'
 import Layout from '../components/layout'
 import Content from '../components/layout/Content'
+import axios from 'axios'
 
 const { Title, Text } = Typography
 const LoginPageWrapped = styled.div`
@@ -69,7 +70,28 @@ const LoginPageWrapped = styled.div`
 
 function LoginPage() {
   const [password, setPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  // const [password, setPassword] = useState('')
+  // const [error, setError] = useState({})
+
+  const { authenticated, setIsAuthenticated } = useContext()
+
+  const history = useHistory()
+
   const handleClick = () => setPassword(!password)
+
+  const handlerSubmit = async (e) => {
+    try {
+      e.preventDefault()
+
+      const res = await axios.post('/user', { email, password })
+
+      setIsAuthenticated(true)
+      history.push('/')
+    } catch (err) {
+      console.dir(err)
+    }
+  }
 
   return (
     <Layout>
@@ -101,7 +123,7 @@ function LoginPage() {
                   </Col>
                 </Row>
 
-                <Button>
+                <Button style={{ backgroundColor: '#319793', color: 'white' }}>
                   <Link to="/homepage">Sign in</Link>
                 </Button>
               </form>
@@ -117,7 +139,10 @@ function LoginPage() {
 
                   <br />
 
-                  <Button colorScheme="teal" size="sm">
+                  <Button
+                    style={{ backgroundColor: '#319793', color: 'white' }}
+                    size="sm"
+                  >
                     <Link to="/register">Sign up</Link>
                   </Button>
                 </div>
