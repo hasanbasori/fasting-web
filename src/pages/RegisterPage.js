@@ -20,9 +20,10 @@ import {
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import '../style/register.css'
-
+import { StoreContext } from '../Context/StoreContextProvider'
 import '../style/register.css'
 import Logo from '../components/logo/Logo'
+import localStorageServices from '../services/localStorageService'
 
 const RegisterPageWrapped = styled.div`
   width: fit-content;
@@ -92,6 +93,9 @@ function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const handleClick = () => setShowPassword(!showPassword)
   const handleConfirmClick = () => setShowConfirmPassword(!showConfirmPassword)
+  const { setIsAuthenticated, isLoading, setIsLoading } = useContext(
+    StoreContext
+  )
 
   const [startDate, setStartDate] = useState(new Date())
   const [input, setInput] = useState({
@@ -112,25 +116,29 @@ function RegisterPage() {
 
   // const history = useHistory()
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
+  const handleInputChange = (values) => {
+    const { name, value } = values.target
     setInput((prev) => ({ ...prev, [name]: value }))
+  }
 
-    if (name === 'email') {
-      if (!value) {
-        setError((prev) => ({ ...prev, email: 'email is required' }))
-      } else if (
-        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-          value
-        )
-      ) {
-        setError((prev) => ({ ...prev, email: 'invalid email address' }))
-      } else {
-        setError((prev) => ({ ...prev, email: false }))
-      }
-    }
-
-    if (name === 'firstName') {
+  const registerForm = async ({
+    firstName,
+    lastName,
+    NickName,
+    birthDate,
+    email,
+    password,
+    confirmPassword,
+    role,
+    image
+  }) => {
+    try {
+      setIsLoading(true)
+      const req = await axios.post('http://localhost:8080/users')
+      const newUser = req.body
+    } catch (err) {
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -153,9 +161,9 @@ function RegisterPage() {
         birthDate,
         email: '',
         password: '',
-        confirmPassword: ''
-        // role: '',
-        // image: ''
+        confirmPassword: '',
+        role: '',
+        image: ''
       })
       .then((res) => {
         // localStorageService.setToken(res.data.accessToken)
@@ -181,12 +189,51 @@ function RegisterPage() {
     return e && e.fileList
   }
 
+  // const handleSubmit = (values) => {
+  //   const {
+  //     firstName,
+  //     lastName,
+  //     NickName,
+  //     birthDate,
+  //     email,
+  //     password,
+  //     confirmPassword,
+  //     role,
+  //     image
+  //   } = input
+  //   values.preventDefault()
+  //   axios
+  //     .post('/users', {
+  //       firstName,
+  //       lastName,
+  //       NickName,
+  //       birthDate,
+  //       email,
+  //       password,
+  //       confirmPassword,
+  //       role,
+  //       image
+  //     })
+  //     .then((res) => {
+  //       localStorageServices(res.data.token)
+  //       setIsAuthenticated(true)
+  //       history.push('/homepage')
+  //     })
+  //     .catch((err) => {
+  //       if (err.response) {
+  //         setError({ server: err.response.data.message })
+  //       } else {
+  //         setError({ front: err.message })
+  //       }
+  //     })
+  // }
+
   return (
     <RegisterPageWrapped>
       <Row className="welcome-container">
         <Col className="welcomeBack">
           <div className="welcome">
-            <h1>Hello, Friend!</h1>
+            <h1 style={{ color: 'white' }}>Hello, Friend!</h1>
             <p>Enter your personal details and start journal with us</p>
 
             <Button type="primary" style={{ backgroundColor: '#319793' }}>
@@ -287,7 +334,7 @@ function RegisterPage() {
                       type="primary"
                       style={{ backgroundColor: '#319793' }}
                     >
-                      <Link to="/homepage">Sign Up</Link>
+                      Sign Up
                     </Button>
                   </Row>
                 </Form>

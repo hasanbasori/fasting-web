@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import { Row, Col, Button, Input, Form, Typography } from 'antd'
+import { Row, Col, Button, Input, Form, Typography, Tag, Spin } from 'antd'
 import Logo from '../components/logo/Logo'
 import styled from 'styled-components'
 import Layout from '../components/layout'
 import Content from '../components/layout/Content'
 import axios from 'axios'
+import { StoreContext } from '../Context/StoreContextProvider'
+import { CloseCircleOutlined } from '@ant-design/icons'
 
 const { Title, Text } = Typography
 const LoginPageWrapped = styled.div`
@@ -69,37 +71,44 @@ const LoginPageWrapped = styled.div`
 `
 
 function LoginPage() {
-  const [password, setPassword] = useState(false)
-  const [email, setEmail] = useState('')
-  // const [password, setPassword] = useState('')
-  // const [error, setError] = useState({})
+  const [error, setError] = useState('')
 
-  const { authenticated, setIsAuthenticated } = useContext()
+  const { setIsAuthenticated, isLoading, setIsLoading } = useContext(
+    StoreContext
+  )
 
   const history = useHistory()
 
-  const handleClick = () => setPassword(!password)
-
-  const handlerSubmit = async (e) => {
+  const handleSubmitLogin = async ({ username, password }) => {
+    console.log(username, password)
     try {
-      e.preventDefault()
+      setIsLoading(true)
+      const res = await axios.get('http://localhost:8080/users')
+      const allUsers = res.data
 
-      const res = await axios.post('/user', { email, password })
+      const foundUser = allUsers.find((user) => {
+        return user.username === username && user.password === password
+      })
 
-      setIsAuthenticated(true)
-      history.push('/')
+      console.log('foundUser', foundUser)
+      setIsAuthenticated(!!foundUser)
+      foundUser
+        ? history.push('/homepage')
+        : setError('Username or Password is invalid!')
     } catch (err) {
-      console.dir(err)
+      console.log(err.response.data.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <Layout>
       <Content>
-        <LoginPageWrapped className="login-wrapper">
-          <Row className="login-container">
-            <Col span={12} className="login-form">
-              <form action="">
+        <Spin size="large" tip="JUST MOMENT PLEASE..." spinning={isLoading}>
+          <LoginPageWrapped className="login-wrapper">
+            <Row className="login-container">
+              <Col span={12} className="login-form">
                 <div className="logoLogin">
                   <Logo />
                 </div>
@@ -111,45 +120,64 @@ function LoginPage() {
                 <br />
                 <Row justify="center" className="login-form">
                   <Col>
-                    <Form.Item>
-                      <Input
-                        style={{ width: '300px' }}
-                        placeholder="Email Address"
-                      />
-                    </Form.Item>
-                    <Form.Item name="password">
-                      <Input.Password placeholder="Password" />
-                    </Form.Item>
+                    <Form onFinish={handleSubmitLogin}>
+                      <Form.Item>
+                        <Input
+                          style={{ width: '300px' }}
+                          placeholder="Email Address"
+                        />
+                      </Form.Item>
+                      <Form.Item name="password">
+                        <Input.Password placeholder="Password" />
+                      </Form.Item>
+                      <Form.Item>
+                        <Button
+                          htmlType="submit"
+                          style={{
+                            backgroundColor: '#319793',
+                            color: 'white'
+                          }}
+                        >
+                          Sign in
+                        </Button>
+                      </Form.Item>
+                      {error && (
+                        <Tag icon={<CloseCircleOutlined />} color="error">
+                          {error}
+                        </Tag>
+                      )}
+                    </Form>
                   </Col>
                 </Row>
+              </Col>
+              <Col span={12} className="welcome-back">
+                <Row justify="center" className="welcome-row">
+                  <div className="welcome">
+                    <Title style={{ marginBottom: 0, color: 'white' }}>
+                      Welcome Back!
+                    </Title>
+                    <Text
+                      style={{ marginBottom: 10, color: 'white' }}
+                      fontSize="md"
+                    >
+                      To keep connected with us please login with your personal
+                      info
+                    </Text>
 
-                <Button style={{ backgroundColor: '#319793', color: 'white' }}>
-                  <Link to="/homepage">Sign in</Link>
-                </Button>
-              </form>
-            </Col>
-            <Col span={12} className="welcome-back">
-              <Row justify="center" className="welcome-row">
-                <div className="welcome">
-                  <Title style={{ marginBottom: 0 }}>Welcome Back!</Title>
-                  <Text fontSize="md">
-                    To keep connected with us please login with your personal
-                    info
-                  </Text>
+                    <br />
 
-                  <br />
-
-                  <Button
-                    style={{ backgroundColor: '#319793', color: 'white' }}
-                    size="sm"
-                  >
-                    <Link to="/register">Sign up</Link>
-                  </Button>
-                </div>
-              </Row>
-            </Col>
-          </Row>
-        </LoginPageWrapped>
+                    <Button
+                      style={{ backgroundColor: '#319793', color: 'white' }}
+                      size="sm"
+                    >
+                      <Link to="/register">Sign up</Link>
+                    </Button>
+                  </div>
+                </Row>
+              </Col>
+            </Row>
+          </LoginPageWrapped>
+        </Spin>
       </Content>
     </Layout>
   )
