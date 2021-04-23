@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage'
 import PostContentPage from './pages/PostContentPage'
 import RegisterPage from './pages/RegisterPage'
 import SummaryPage from './pages/SummaryPage'
+import VideoPostPage from './pages/VideoPostPage'
+import SingleContentPage from '../src/pages/SingleContentPage'
 
 function App() {
   return (
@@ -16,9 +18,11 @@ function App() {
           <Route path="/fasting" component={FastingPage} />
           <Route path="/homepage" component={HomePage} />
           <Route path="/login" component={LoginPage} />
-          <Route path="/content-post" component={PostContentPage} />
+          <Route path="/content" component={PostContentPage} />
+          <Route path="/single-content" component={SingleContentPage} />
           <Route path="/register" component={RegisterPage} />
           <Route path="/summary" component={SummaryPage} />
+          <Route path="/video" component={VideoPostPage} />
         </Switch>
       </BrowserRouter>
     </div>

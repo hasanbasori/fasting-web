@@ -1,9 +1,6 @@
 .greeting-user {
-  height: 12vh;
-  width: 100%;
   margin-left: 200px;
   margin-top: 50px;
-  margin-top: 110px;
 }
 
 .reccomment-banner-wrap {
@@ -11,7 +8,6 @@
   justify-content: center;
   align-items: center;
   /* height: 75vh; */
-  width: 100%;
 }
 .reccomment-banner {
   width: 900px;

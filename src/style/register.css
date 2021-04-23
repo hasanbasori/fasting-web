@@ -104,14 +104,4 @@ p {
   border: 1px solid silver;
 }
 
-.welcomeBack {
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  background-color: orange;
-  border-radius: 0px 10px 10px 0px;
-  width: 50%;
-  height: 100%;
-  color: whitesmoke;
-}
+

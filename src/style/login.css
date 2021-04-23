@@ -11,10 +11,10 @@
   width: 100%;
 }
 .login-container {
-  display: flex;
+  /* display: flex;
   justify-content: center;
   text-align: center;
-  align-items: center;
+  align-items: center; */
   width: 60vw;
   height: 60vh;
   border-radius: 10px;
@@ -31,20 +31,9 @@
 }
 
 .welcomeBack {
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
   background-color: orange;
   border-radius: 0px 10px 10px 0px;
   width: 50%;
   height: 100%;
   color: whitesmoke;
-}
-
-.login-form {
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  flex-direction: column;
 }

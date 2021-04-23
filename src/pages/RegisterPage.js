@@ -1,4 +1,11 @@
-import React, { useState } from 'react'
+import React, {
+  useState,
+  useContext,
+  AuthContext,
+  axios,
+  localStorageService
+} from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import {
   DatePicker,
   Typography,
@@ -17,19 +24,32 @@ import '../style/register.css'
 import '../style/register.css'
 import Logo from '../components/logo/Logo'
 
-const Comp = styled.div`
-  .register-wrapper {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+const RegisterPageWrapped = styled.div`
+  width: fit-content;
+  margin: 80px auto 0 auto;
+
+  .logo {
     text-align: center;
   }
-
-  .register-container {
+  .welcomeBack {
+    border-radius: 0 !important;
     display: flex;
     justify-content: center;
+    text-align: center;
     align-items: center;
+    background-color: orange;
+    border-radius: 0px 10px 10px 0px;
+    width: 50%;
+    height: auto;
+    color: whitesmoke;
+  }
+
+  .welcome-container {
+    overflow: hidden;
+  }
+
+  .register-container,
+  .welcome-container {
     width: 60vw;
     height: 80vh;
     border-radius: 10px;
@@ -51,36 +71,18 @@ const Comp = styled.div`
   .ant-col.ant-form-item-control {
     text-align: left;
   }
-  /*.input {
-    width: 300px;
-    height: 30px;
-    border-radius: 5px;
-    padding: 2px;
-    margin: 3px;
-  }
-  .input-name {
-    width: 150px;
-    height: 30px;
-    border-radius: 5px;
-    padding: 2px;
-    margin: 2px;
-    border: 1px 30px 0 0 solid silver;
-  }
-  .greeting-friends {
+  .video-card {
+    border-radius: 0 !important;
     display: flex;
     justify-content: center;
+    text-align: center;
     align-items: center;
     background-color: orange;
-    border-radius: 10px 0 0 10px;
-
+    border-radius: 0px 10px 10px 0px;
     width: 50%;
-    height: 100%;
-    color: white;
+    height: auto;
+    color: whitesmoke;
   }
-
-  .login-form {
-    width: 50%;
-  } */
 `
 
 const { Text, Title } = Typography
@@ -92,7 +94,83 @@ function RegisterPage() {
   const handleConfirmClick = () => setShowConfirmPassword(!showConfirmPassword)
 
   const [startDate, setStartDate] = useState(new Date())
+  const [input, setInput] = useState({
+    firstName: '',
+    lastName: '',
+    NickName: '',
+    birthDate: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: '',
+    image: ''
+  })
 
+  const [error, setError] = useState({})
+
+  // const { setIsAuthenticated } = useContext(AuthContext)
+
+  // const history = useHistory()
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setInput((prev) => ({ ...prev, [name]: value }))
+
+    if (name === 'email') {
+      if (!value) {
+        setError((prev) => ({ ...prev, email: 'email is required' }))
+      } else if (
+        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+          value
+        )
+      ) {
+        setError((prev) => ({ ...prev, email: 'invalid email address' }))
+      } else {
+        setError((prev) => ({ ...prev, email: false }))
+      }
+    }
+
+    if (name === 'firstName') {
+    }
+  }
+
+  const handleSubmitRegister = (values) => {
+    const {
+      email,
+      firstName,
+      lastName,
+      nickName,
+      birthDate,
+      password,
+      confirmPassword
+    } = input
+    console.log('e', values)
+    axios
+      .post('/register', {
+        firstName,
+        lastName,
+        nickName: '',
+        birthDate,
+        email: '',
+        password: '',
+        confirmPassword: ''
+        // role: '',
+        // image: ''
+      })
+      .then((res) => {
+        // localStorageService.setToken(res.data.accessToken)
+        // setIsAuthenticated(true)
+        console.log('res', res)
+        // history.push('/')
+      })
+      .catch((err) => {
+        if (err.response) {
+          setError({ server: err.response.data.message })
+        } else {
+          setError({ front: err.message })
+        }
+      })
+  }
   function normFile(e) {
     console.log('Upload event:', e)
 
@@ -104,20 +182,20 @@ function RegisterPage() {
   }
 
   return (
-    <div className="register-wrapper">
-      <div className="register-container">
-        <div className="welcomeBack">
+    <RegisterPageWrapped>
+      <Row className="welcome-container">
+        <Col className="welcomeBack">
           <div className="welcome">
             <h1>Hello, Friend!</h1>
             <p>Enter your personal details and start journal with us</p>
 
             <Button type="primary" style={{ backgroundColor: '#319793' }}>
-              Sign In
+              <Link to="/login">Sign In</Link>
             </Button>
           </div>
-        </div>
+        </Col>
 
-        <div className="register-form">
+        <Col className="register-form">
           <div className="logo">
             <img
               className="img"
@@ -129,26 +207,31 @@ function RegisterPage() {
           <div className="form-register">
             <Col span={12}>
               <Row justify="center">
-                <Form
-                  className="login-form"
-                  onFinish={(values) => console.log(values)}
-                >
+                <Form className="login-form" onFinish={handleSubmitRegister}>
                   <Row gutter={8}>
-                    <Col>
+                    <Col span={12}>
                       <Form.Item name="firstName">
                         <Input placeholder="First Name" />
                       </Form.Item>
                     </Col>
-                    <Col>
+                    <Col span={12}>
                       <Form.Item name="lastName">
-                        <Input placeholder="Last Name" />
+                        <Input
+                          placeholder="Last Name"
+                          value={input.lastName}
+                          onChange={handleInputChange}
+                        />
                       </Form.Item>
                     </Col>
                   </Row>
                   <Row gutter={8}>
-                    <Col>
+                    <Col span={12}>
                       <Form.Item name="nickName">
-                        <Input placeholder="Nick Name" />
+                        <Input
+                          placeholder="Nick Name"
+                          value={input.nickName}
+                          onChange={handleInputChange}
+                        />
                       </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -160,13 +243,22 @@ function RegisterPage() {
 
                   <Form.Item name="email">
                     <Input placeholder="Email Address" />{' '}
-                    <Input.Password placeholder="Password" />
                   </Form.Item>
-                  {/* <Form.Item name="password"> */}
 
-                  {/* </Form.Item> */}
+                  <Form.Item name="password">
+                    <Input.Password
+                      placeholder="Password"
+                      placeholder="รหัสผ่าน"
+                      value={input.password}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Item>
                   <Form.Item name="confirmPassword">
-                    <Input.Password placeholder="Confirm Password" />
+                    <Input.Password
+                      placeholder="Confirm Password"
+                      value={input.confirmPassword}
+                      onChange={handleInputChange}
+                    />
                   </Form.Item>
 
                   <Form.Item name="userType" label="Please select user type">
@@ -185,22 +277,21 @@ function RegisterPage() {
                   >
                     <Upload name="logo" action="/upload.do" listType="picture">
                       <Button icon={<UploadOutlined />}>
-                        PLEASE, UPLOAD YOUR PROFILE PICTURE HERE.
+                        CLICK TO UPLOAD YOUR PROFILE PICTURE HERE.
                       </Button>
                     </Upload>
                   </Form.Item>
                   <br />
                   <Button type="primary" style={{ backgroundColor: '#319793' }}>
-                    Sign Up
+                    <Link to="/homepage">Sign Up</Link>
                   </Button>
                 </Form>
               </Row>
             </Col>
           </div>
-          <div></div>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </RegisterPageWrapped>
   )
 }
 

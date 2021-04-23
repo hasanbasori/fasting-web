@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import '../style/fastingpage.css'
+import axios from 'axios'
 // import { Button, Select } from "@chakra-ui/react";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { Button, Select } from 'antd'
@@ -8,8 +9,26 @@ import Content from '../components/layout/Content'
 import Header from '../components/layout/Header'
 
 function FastingPage() {
-  const [startf, setStartf] = React.useState(false)
-  const handleClick = () => setStartf(!startf)
+  const [startF, setStartF] = useState(false)
+  const handleClick = () => setStartF(!startF)
+  const [plans, setPlans] = useState([])
+  const [fastingHrs, setFastingHrs] = useState(0)
+  const [remainingHrs, setRemainingHrs] = useState(fastingHrs)
+
+  //effect
+  useEffect(() => {
+    fetchPostContents()
+  }, [])
+
+  console.log(remainingHrs)
+  async function fetchPostContents() {
+    try {
+      const { data } = await axios.get('http://localhost:8080/plans')
+      setPlans(data)
+    } catch (err) {
+      console.error(err?.response.data.message)
+    }
+  }
 
   const percentage = 30
   return (
@@ -20,23 +39,28 @@ function FastingPage() {
           <div className="fastingtime-box">
             <div className="fasting-box-component">
               <div className="planfasting">
-                <Select style={{ width: '300px', marginTop: '35px' }}>
-                  <option value="option0">Choose your fasting plan</option>
-                  <option value="option1">12/12</option>
-                  <option value="option2">16/8</option>
-                  <option value="option3">18/6</option>
-                  <option value="option5">20/4</option>
-                  <option value="option6">22/2</option>
-                  <option value="option7">23/1</option>
-                  <option value="option8">24 h.</option>
-                  <option value="option9">48 h.</option>
-                  <option value="option10">72 h.</option>
+                <Select
+                  defaultValue="Choose your fasting plan"
+                  style={{ width: '300px', marginTop: '35px' }}
+                  onChange={(value) => {
+                    const selectedPlan = Number(value.split(/[ |\/]/)[0])
+                    setFastingHrs(selectedPlan)
+                    setRemainingHrs(selectedPlan)
+                  }}
+                >
+                  {plans.map((plan) => {
+                    return (
+                      <option key={plan.id} value={plan.value}>
+                        {plan.value}
+                      </option>
+                    )
+                  })}
                 </Select>
               </div>
               <div className="timefasting">
                 <CircularProgressbar
-                  value={percentage}
-                  text={`${percentage}%`}
+                  value={remainingHrs}
+                  text={`${remainingHrs}%`}
                   strokeWidth={15}
                   styles={buildStyles({
                     // Rotation of path and trail, in number of turns (0-1)
@@ -65,7 +89,7 @@ function FastingPage() {
 
               <div className="controlfasting">
                 <Button colorScheme="teal" onClick={handleClick}>
-                  {startf ? 'End fast' : 'Start fast'}
+                  {startF ? 'End fast' : 'Start fast'}
                 </Button>
                 <Button colorScheme="teal">Edit Fast</Button>
               </div>

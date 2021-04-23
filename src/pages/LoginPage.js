@@ -1,79 +1,132 @@
 import React, { useState } from 'react'
-
-import '../style/login.css'
-import { Row, Button, Input, Form, Typography } from 'antd'
+import { Link } from 'react-router-dom'
+import { Row, Col, Button, Input, Form, Typography } from 'antd'
 import Logo from '../components/logo/Logo'
+import styled from 'styled-components'
+import Layout from '../components/layout'
+import Content from '../components/layout/Content'
 
 const { Title, Text } = Typography
+const LoginPageWrapped = styled.div`
+  width: fit-content;
+  margin: 80px auto 0 auto;
+  /* .login-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  } */
+  /* .logoLogin {
+    display: flex;
+    text-align: center;
+    width: 100%;
+  } */
+  .login-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    width: 60vw;
+    height: 60vh;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 4px 8px 8px silver;
+    border: 1px solid rgb(223, 223, 223);
+  }
+
+  .input {
+    width: 50%;
+    /* border-radius: 5px; */
+    height: 30px;
+    border: 1px solid silver;
+  }
+  .welcome-row {
+    width: 100%;
+  }
+
+  .welcome-back {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: orange;
+    border-radius: 0px 10px 10px 0px;
+    height: 100%;
+    color: whitesmoke;
+  }
+  .welcome {
+    width: 100%;
+    margin: 5px;
+  }
+  .ant-row.ant-form-item {
+    margin: 5px;
+  }
+  img {
+    width: 150px;
+  }
+`
 
 function LoginPage() {
   const [password, setPassword] = useState(false)
   const handleClick = () => setPassword(!password)
 
   return (
-    <div className="login-wrapper">
-      <div className="login-container">
-        <div className="login-form">
-          <form action="">
-            <div className="logoLogin">
-              <Logo />
-            </div>
-            <div>
-              <Title as="h2" size="md" mt="10px">
-                Sign in to your account
-              </Title>
-            </div>
-            <br />
-            <div className="login-form">
-              <Row direction="column">
-                <div>
-                  <Form w="460px" id="email" isRequired>
-                    <Input w="450px" placeholder="Email address" m="7.5px" />
-                  </Form>
+    <Layout>
+      <Content>
+        <LoginPageWrapped className="login-wrapper">
+          <Row className="login-container">
+            <Col span={12} className="login-form">
+              <form action="">
+                <div className="logoLogin">
+                  <Logo />
                 </div>
-
                 <div>
-                  {/* <InputGroup w="450px" size="md" m="7.5px">
-                    <Input
-                      pr="4.5rem"
-                      type={password ? 'text' : 'password'}
-                      placeholder="Enter password"
-                    />
-                    <InputRightElement width="4.5rem">
-                      <Button h="1.75rem" size="sm" onClick={handleClick}>
-                        {password ? 'Hide' : 'Show'}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup> */}
+                  <Title style={{ fontSize: 18 }}>
+                    Sign in to your account
+                  </Title>
+                </div>
+                <br />
+                <Row justify="center" className="login-form">
+                  <Col>
+                    <Form.Item>
+                      <Input
+                        style={{ width: '300px' }}
+                        placeholder="Email Address"
+                      />
+                    </Form.Item>
+                    <Form.Item name="password">
+                      <Input.Password placeholder="Password" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Button>
+                  <Link to="/homepage">Sign in</Link>
+                </Button>
+              </form>
+            </Col>
+            <Col span={12} className="welcome-back">
+              <Row justify="center" className="welcome-row">
+                <div className="welcome">
+                  <Title style={{ marginBottom: 0 }}>Welcome Back!</Title>
+                  <Text fontSize="md">
+                    To keep connected with us please login with your personal
+                    info
+                  </Text>
+
+                  <br />
+
+                  <Button colorScheme="teal" size="sm">
+                    <Link to="/register">Sign up</Link>
+                  </Button>
                 </div>
               </Row>
-            </div>
-            <br />
-            <div>
-              <Button colorScheme="teal" size="sm">
-                Sign in
-              </Button>
-            </div>
-          </form>
-        </div>
-        <div className="welcomeBack">
-          <div className="welcome">
-            <Title as="h2" size="xl">
-              Welcome Back!
-            </Title>
-            <Text fontSize="md">
-              To keep connected with us please login with your personal info
-            </Text>
-
-            <br />
-
-            <Button colorScheme="teal" size="sm">
-              Sign up
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Col>
+          </Row>
+        </LoginPageWrapped>
+      </Content>
+    </Layout>
   )
 }
 

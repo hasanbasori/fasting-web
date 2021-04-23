@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Radio } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
-
+import { Link, Route } from 'react-router-dom'
 import { FaFacebook } from 'react-icons/fa'
 
 function ButtonOnNavbar() {
@@ -12,14 +12,33 @@ function ButtonOnNavbar() {
   return (
     <div className="buttonOnNavbar">
       <Radio.Group value="large" onChange={handleChangeComponent}>
-        <Radio.Button value="home">Home</Radio.Button>
-        <Radio.Button value="video">Video</Radio.Button>
-        <Radio.Button value="blog">Blog</Radio.Button>
-        <Radio.Button value="fasting">Fasting</Radio.Button>
-        <Radio.Button value="aboutUs">About Us</Radio.Button>
-        <Radio.Button value="logOut">Log out</Radio.Button>
+        <Radio.Button value="home">
+          <Link to="/homepage">Home</Link>
+        </Radio.Button>
+        <Radio.Button value="video">
+          <Link to="/video">Video</Link>
+        </Radio.Button>
+        <Radio.Button value="blog">
+          <Link to="/content">Blog</Link>
+        </Radio.Button>
+        <Radio.Button value="fasting">
+          <Link to="/fasting">Fasting</Link>
+        </Radio.Button>
+        <Radio.Button value="aboutUs">
+          <Link to="/summary">Profile</Link>{' '}
+        </Radio.Button>
+        <Radio.Button value="logOut">
+          <Link to="/login">Log out</Link>
+        </Radio.Button>
+
         <Radio.Button value="facebook">
-          <FaFacebook />{' '}
+          <a
+            target="_blank"
+            href="https://www.facebook.com/Zero-Kcal-105648521654052"
+          >
+            {' '}
+            <FaFacebook />{' '}
+          </a>
         </Radio.Button>
       </Radio.Group>
       {/* <ButtonGroup spacing="1">
