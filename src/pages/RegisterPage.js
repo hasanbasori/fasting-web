@@ -1,11 +1,6 @@
-import React, {
-  useState,
-  useContext,
-  AuthContext,
-  axios,
-  localStorageService
-} from 'react'
+import React, { useState, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
+import axios from 'axios'
 import {
   DatePicker,
   Typography,
@@ -23,7 +18,7 @@ import '../style/register.css'
 import { StoreContext } from '../Context/StoreContextProvider'
 import '../style/register.css'
 import Logo from '../components/logo/Logo'
-import localStorageServices from '../services/localStorageService'
+import localStorageService from '../services/localStorageService'
 
 const RegisterPageWrapped = styled.div`
   width: fit-content;
@@ -89,6 +84,18 @@ const RegisterPageWrapped = styled.div`
 const { Text, Title } = Typography
 
 function RegisterPage() {
+  const [input, setInput] = useState({
+    firstName: '',
+    lastName: '',
+    nickName: '',
+    birthDate: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: '',
+    image: ''
+  })
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const handleClick = () => setShowPassword(!showPassword)
@@ -98,17 +105,6 @@ function RegisterPage() {
   )
 
   const [startDate, setStartDate] = useState(new Date())
-  const [input, setInput] = useState({
-    firstName: '',
-    lastName: '',
-    NickName: '',
-    birthDate: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: '',
-    image: ''
-  })
 
   const [error, setError] = useState({})
 
@@ -119,6 +115,75 @@ function RegisterPage() {
   const handleInputChange = (values) => {
     const { name, value } = values.target
     setInput((prev) => ({ ...prev, [name]: value }))
+
+    if (name === 'firstName') {
+      if (!value) {
+        setError((prev) => ({ ...prev, firstName: 'First name is required' }))
+      }
+    }
+
+    if (name === 'lastName') {
+      if (!value) {
+        setError((prev) => ({ ...prev, firstName: 'Last name is required' }))
+      }
+    }
+    if (name === 'nickName') {
+      if (!value) {
+        setError((prev) => ({ ...prev, firstName: 'Nickname is required' }))
+      }
+    }
+    if (name === 'birthDate') {
+      if (!value) {
+        setError((prev) => ({
+          ...prev,
+          firstName: 'Please, Input your birth date'
+        }))
+      }
+    }
+    if (name === 'email') {
+      if (!value) {
+        setError((prev) => ({ ...prev, email: 'Email is required' }))
+      } else if (
+        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+          value
+        )
+      ) {
+        setError((prev) => ({ ...prev, email: 'Invalid email address' }))
+      } else {
+        setError((prev) => ({ ...prev, email: false }))
+      }
+    }
+    if (name === 'password') {
+      if (!value) {
+        setError((prev) => ({ ...prev, password: 'Password is required' }))
+      }
+    }
+    if (name === 'confirmPassword') {
+      if (!value) {
+        setError((prev) => ({
+          ...prev,
+          password: 'Confirm password is required'
+        }))
+      }
+    }
+    if (name === 'user') {
+      if (!value) {
+        setError((prev) => ({ ...prev, password: 'Please , choose user type' }))
+      }
+    }
+    if (name === 'creator') {
+      if (!value) {
+        setError((prev) => ({ ...prev, password: 'Please , choose user type' }))
+      }
+    }
+    if (name === 'img') {
+      if (!value) {
+        setError((prev) => ({
+          ...prev,
+          password: 'Please ,Choose your Image profile'
+        }))
+      }
+    }
   }
 
   const registerForm = async ({
@@ -152,9 +217,10 @@ function RegisterPage() {
       password,
       confirmPassword
     } = input
-    console.log('e', values)
+
+    console.log('values', values)
     axios
-      .post('/register', {
+      .post('/users', {
         firstName,
         lastName,
         nickName: '',
@@ -166,10 +232,9 @@ function RegisterPage() {
         image: ''
       })
       .then((res) => {
-        // localStorageService.setToken(res.data.accessToken)
-        // setIsAuthenticated(true)
+        localStorageService.setToken(res.data.accessToken)
+
         console.log('res', res)
-        // history.push('/')
       })
       .catch((err) => {
         if (err.response) {
@@ -179,54 +244,22 @@ function RegisterPage() {
         }
       })
   }
-  function normFile(e) {
-    console.log('Upload event:', e)
+  function normFile(values) {
+    console.log('Upload event:', values)
 
-    if (Array.isArray(e)) {
-      return e
+    if (Array.isArray(values)) {
+      return values
     }
 
-    return e && e.fileList
+    return values && values.fileList
   }
 
-  // const handleSubmit = (values) => {
-  //   const {
-  //     firstName,
-  //     lastName,
-  //     NickName,
-  //     birthDate,
-  //     email,
-  //     password,
-  //     confirmPassword,
-  //     role,
-  //     image
-  //   } = input
-  //   values.preventDefault()
-  //   axios
-  //     .post('/users', {
-  //       firstName,
-  //       lastName,
-  //       NickName,
-  //       birthDate,
-  //       email,
-  //       password,
-  //       confirmPassword,
-  //       role,
-  //       image
-  //     })
-  //     .then((res) => {
-  //       localStorageServices(res.data.token)
-  //       setIsAuthenticated(true)
-  //       history.push('/homepage')
-  //     })
-  //     .catch((err) => {
-  //       if (err.response) {
-  //         setError({ server: err.response.data.message })
-  //       } else {
-  //         setError({ front: err.message })
-  //       }
-  //     })
-  // }
+  const [value, setValue] = useState(1)
+
+  const onChange = (values) => {
+    console.log('radio checked', values.target.value)
+    setValue(values.target.value)
+  }
 
   return (
     <RegisterPageWrapped>
@@ -258,7 +291,11 @@ function RegisterPage() {
                   <Row gutter={8}>
                     <Col span={12}>
                       <Form.Item name="firstName">
-                        <Input placeholder="First Name" />
+                        <Input
+                          placeholder="First Name"
+                          value={input.firstName}
+                          onChange={handleInputChange}
+                        />
                       </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -275,7 +312,7 @@ function RegisterPage() {
                     <Col span={12}>
                       <Form.Item name="nickName">
                         <Input
-                          placeholder="Nick Name"
+                          placeholder="nickName"
                           value={input.nickName}
                           onChange={handleInputChange}
                         />
@@ -283,13 +320,21 @@ function RegisterPage() {
                     </Col>
                     <Col span={12}>
                       <Form.Item noStyle name="birthDate">
-                        <DatePicker style={{ width: '100%' }} />
+                        <DatePicker
+                          style={{ width: '100%' }}
+                          value={input.birthDate}
+                          onChange={handleInputChange}
+                        />
                       </Form.Item>
                     </Col>
                   </Row>
 
                   <Form.Item name="email">
-                    <Input placeholder="Email Address" />{' '}
+                    <Input
+                      placeholder="Email Address"
+                      value={input.email}
+                      onChange={handleInputChange}
+                    />
                   </Form.Item>
 
                   <Form.Item name="password">
@@ -309,9 +354,21 @@ function RegisterPage() {
                   </Form.Item>
 
                   <Form.Item name="userType" label="Please select user type">
-                    <Radio.Group>
-                      <Radio>User</Radio>
-                      <Radio>Creator</Radio>
+                    <Radio.Group onChange={onChange} value={value}>
+                      <Radio
+                        value={1}
+                        value={input.user}
+                        onChange={handleInputChange}
+                      >
+                        User
+                      </Radio>
+                      <Radio
+                        value={2}
+                        value={input.creator}
+                        onChange={handleInputChange}
+                      >
+                        Creator
+                      </Radio>
                     </Radio.Group>
                   </Form.Item>
 
@@ -322,7 +379,13 @@ function RegisterPage() {
                     extra="longgggggggggggggggggggggggggggggggggg"
                     noStyle
                   >
-                    <Upload name="logo" action="/upload.do" listType="picture">
+                    <Upload
+                      name="logo"
+                      action="/upload.do"
+                      listType="picture"
+                      value={input.img}
+                      onChange={handleInputChange}
+                    >
                       <Button icon={<UploadOutlined />}>
                         CLICK TO UPLOAD YOUR PROFILE PICTURE HERE.
                       </Button>
@@ -336,6 +399,11 @@ function RegisterPage() {
                     >
                       Sign Up
                     </Button>
+                    {error.email && (
+                      <span class="help-block" style={{ color: 'red' }}>
+                        {error.email}
+                      </span>
+                    )}
                   </Row>
                 </Form>
               </Row>
