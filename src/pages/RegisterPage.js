@@ -19,6 +19,7 @@ import { StoreContext } from '../Context/StoreContextProvider'
 import '../style/register.css'
 import Logo from '../components/logo/Logo'
 import localStorageService from '../services/localStorageService'
+import moment from 'moment'
 
 const RegisterPageWrapped = styled.div`
   width: fit-content;
@@ -110,37 +111,50 @@ function RegisterPage() {
 
   // const { setIsAuthenticated } = useContext(AuthContext)
 
-  // const history = useHistory()
+  const history = useHistory()
 
   const handleInputChange = (values) => {
-    const { name, value } = values.target
-    setInput((prev) => ({ ...prev, [name]: value }))
+    let id, value, date, name
+    if (!values.target) {
+      date = moment(values).format()
+      console.log('date:', date)
+      setInput((prev) => ({ ...prev, birthDate: date }))
+    } else if (values.target.id) {
+      console.log('target :>> ', values.target)
+      id = values.target.id
+      value = values.target.value
+      setInput((prev) => ({ ...prev, [id]: value }))
+    } else if (values.target.name) {
+      name = values.target.name
+      value = values.target.value
+      setInput((prev) => ({ ...prev, [name]: value }))
+    }
 
-    if (name === 'firstName') {
+    if (id === 'firstName') {
       if (!value) {
         setError((prev) => ({ ...prev, firstName: 'First name is required' }))
       }
     }
 
-    if (name === 'lastName') {
+    if (id === 'lastName') {
       if (!value) {
-        setError((prev) => ({ ...prev, firstName: 'Last name is required' }))
+        setError((prev) => ({ ...prev, lastName: 'Last name is required' }))
       }
     }
-    if (name === 'nickName') {
+    if (id === 'nickName') {
       if (!value) {
-        setError((prev) => ({ ...prev, firstName: 'Nickname is required' }))
+        setError((prev) => ({ ...prev, nickName: 'Nickname is required' }))
       }
     }
-    if (name === 'birthDate') {
+    if (!values.target) {
       if (!value) {
         setError((prev) => ({
           ...prev,
-          firstName: 'Please, Input your birth date'
+          birthDate: 'Please input your birth date'
         }))
       }
     }
-    if (name === 'email') {
+    if (id === 'email') {
       if (!value) {
         setError((prev) => ({ ...prev, email: 'Email is required' }))
       } else if (
@@ -153,12 +167,12 @@ function RegisterPage() {
         setError((prev) => ({ ...prev, email: false }))
       }
     }
-    if (name === 'password') {
+    if (id === 'password') {
       if (!value) {
         setError((prev) => ({ ...prev, password: 'Password is required' }))
       }
     }
-    if (name === 'confirmPassword') {
+    if (id === 'confirmPassword') {
       if (!value) {
         setError((prev) => ({
           ...prev,
@@ -166,21 +180,11 @@ function RegisterPage() {
         }))
       }
     }
-    if (name === 'user') {
-      if (!value) {
-        setError((prev) => ({ ...prev, password: 'Please , choose user type' }))
-      }
-    }
-    if (name === 'creator') {
-      if (!value) {
-        setError((prev) => ({ ...prev, password: 'Please , choose user type' }))
-      }
-    }
-    if (name === 'img') {
+    if (id === 'img') {
       if (!value) {
         setError((prev) => ({
           ...prev,
-          password: 'Please ,Choose your Image profile'
+          img: 'Please ,Choose your Image profile'
         }))
       }
     }
@@ -207,43 +211,13 @@ function RegisterPage() {
     }
   }
 
-  const handleSubmitRegister = (values) => {
-    const {
-      email,
-      firstName,
-      lastName,
-      nickName,
-      birthDate,
-      password,
-      confirmPassword
-    } = input
-
-    console.log('values', values)
-    axios
-      .post('/users', {
-        firstName,
-        lastName,
-        nickName: '',
-        birthDate,
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: '',
-        image: ''
-      })
-      .then((res) => {
-        localStorageService.setToken(res.data.accessToken)
-
-        console.log('res', res)
-      })
-      .catch((err) => {
-        if (err.response) {
-          setError({ server: err.response.data.message })
-        } else {
-          setError({ front: err.message })
-        }
-      })
+  const handleSubmitRegister = async () => {
+    console.log('hello sending')
+    const res = await axios.post('http://localhost:8080/users', input)
+    history.push('/homepage')
+    console.log(res)
   }
+
   function normFile(values) {
     console.log('Upload event:', values)
 
@@ -254,16 +228,10 @@ function RegisterPage() {
     return values && values.fileList
   }
 
-  const [value, setValue] = useState(1)
-
-  const onChange = (values) => {
-    console.log('radio checked', values.target.value)
-    setValue(values.target.value)
-  }
-
   return (
     <RegisterPageWrapped>
       <Row className="welcome-container">
+        {console.log(input)}
         <Col className="welcomeBack">
           <div className="welcome">
             <h1 style={{ color: 'white' }}>Hello, Friend!</h1>
@@ -290,7 +258,7 @@ function RegisterPage() {
                 <Form className="login-form" onFinish={handleSubmitRegister}>
                   <Row gutter={8}>
                     <Col span={12}>
-                      <Form.Item name="firstName">
+                      <Form.Item name="firstName" rules={[{ required: true }]}>
                         <Input
                           placeholder="First Name"
                           value={input.firstName}
@@ -299,7 +267,7 @@ function RegisterPage() {
                       </Form.Item>
                     </Col>
                     <Col span={12}>
-                      <Form.Item name="lastName">
+                      <Form.Item name="lastName" rules={[{ required: true }]}>
                         <Input
                           placeholder="Last Name"
                           value={input.lastName}
@@ -310,7 +278,7 @@ function RegisterPage() {
                   </Row>
                   <Row gutter={8}>
                     <Col span={12}>
-                      <Form.Item name="nickName">
+                      <Form.Item name="nickName" rules={[{ required: true }]}>
                         <Input
                           placeholder="nickName"
                           value={input.nickName}
@@ -319,17 +287,23 @@ function RegisterPage() {
                       </Form.Item>
                     </Col>
                     <Col span={12}>
-                      <Form.Item noStyle name="birthDate">
+                      <Form.Item
+                        noStyle
+                        id="birthDate"
+                        name="birthDate"
+                        rules={[{ required: true }]}
+                      >
                         <DatePicker
                           style={{ width: '100%' }}
                           value={input.birthDate}
+                          id="birthDate"
                           onChange={handleInputChange}
                         />
                       </Form.Item>
                     </Col>
                   </Row>
 
-                  <Form.Item name="email">
+                  <Form.Item name="email" rules={[{ required: true }]}>
                     <Input
                       placeholder="Email Address"
                       value={input.email}
@@ -337,7 +311,12 @@ function RegisterPage() {
                     />
                   </Form.Item>
 
-                  <Form.Item name="password">
+                  <Form.Item
+                    name="password"
+                    rules={[
+                      { required: true, message: 'please enter this form' }
+                    ]}
+                  >
                     <Input.Password
                       placeholder="Password"
                       placeholder="รหัสผ่าน"
@@ -345,7 +324,20 @@ function RegisterPage() {
                       onChange={handleInputChange}
                     />
                   </Form.Item>
-                  <Form.Item name="confirmPassword">
+                  <Form.Item
+                    name="confirmPassword"
+                    rules={[
+                      { required: true, message: 'please re enter password' },
+                      ({ getFieldValue }) => ({
+                        validator(rule, value) {
+                          if (!value || getFieldValue('password') === value) {
+                            return Promise.resolve()
+                          }
+                          return Promise.reject('password not match')
+                        }
+                      })
+                    ]}
+                  >
                     <Input.Password
                       placeholder="Confirm Password"
                       value={input.confirmPassword}
@@ -353,26 +345,25 @@ function RegisterPage() {
                     />
                   </Form.Item>
 
-                  <Form.Item name="userType" label="Please select user type">
-                    <Radio.Group onChange={onChange} value={value}>
-                      <Radio
-                        value={1}
-                        value={input.user}
-                        onChange={handleInputChange}
-                      >
+                  <Form.Item
+                    name="userType"
+                    label="Please select user type"
+                    rules={[{ required: true }]}
+                  >
+                    <Radio.Group
+                      id="role"
+                      name="role"
+                      value={input.role}
+                      onChange={handleInputChange}
+                    >
+                      <Radio value={'user'} defaultChecked="true">
                         User
                       </Radio>
-                      <Radio
-                        value={2}
-                        value={input.creator}
-                        onChange={handleInputChange}
-                      >
-                        Creator
-                      </Radio>
+                      <Radio value={'creator'}>Creator</Radio>
                     </Radio.Group>
                   </Form.Item>
 
-                  <Form.Item
+                  {/* <Form.Item
                     name="profileImage"
                     valuePropName="profileImage"
                     getValueFromEvent={normFile}
@@ -390,12 +381,13 @@ function RegisterPage() {
                         CLICK TO UPLOAD YOUR PROFILE PICTURE HERE.
                       </Button>
                     </Upload>
-                  </Form.Item>
+                  </Form.Item> */}
                   <br />
                   <Row justify="center">
                     <Button
                       type="primary"
                       style={{ backgroundColor: '#319793' }}
+                      onClick={handleSubmitRegister}
                     >
                       Sign Up
                     </Button>
@@ -416,7 +408,6 @@ function RegisterPage() {
 }
 
 export default RegisterPage
-
 //  <div className="register-wrapper">
 // <Row className="register-container" justify="center" align="middle">
 //   <Row>
