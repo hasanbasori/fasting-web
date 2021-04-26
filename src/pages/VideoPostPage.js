@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
 import Layout from '../components/layout'
 import Content from '../components/layout/Content'
@@ -12,6 +12,7 @@ import {
   EllipsisOutlined,
   CloseOutlined
 } from '@ant-design/icons'
+import { StoreContext } from '../Context/StoreContextProvider'
 
 const VideoPageWrapped = styled.div`
   display: flex;
@@ -58,7 +59,9 @@ function VideoPostPage() {
 
   const [postVideo, setPostVideo] = useState([])
   const [loading, setLoading] = useState(false)
-
+  const { setIsAuthenticated, isLoading, setIsLoading } = useContext(
+    StoreContext
+  )
   //effect
   useEffect(() => {
     fetchPostVideo()
@@ -99,6 +102,7 @@ function VideoPostPage() {
   }
 
   const handleOk = () => {
+    form.validateFields()
     form.submit()
     setIsModalVisible(false)
   }
@@ -126,12 +130,20 @@ function VideoPostPage() {
     }
   }
 
-  const onFinish = (values) => {
-    console.log(values)
+  const handleAddVideo = async (values) => {
+    try {
+      setIsLoading(true)
+      await axios.post('http://localhost:8080/video-posts', values)
+      await fetchPostVideo()
+    } catch (err) {
+      console.error(err?.response.data.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <Spin tip="JUST MOMENT PLEASE..." spinning={loading}>
+    <Spin tip="JUST MOMENT PLEASE..." spinning={isLoading}>
       <VideoPageWrapped>
         <Layout className="video-wrapper">
           <Header />
@@ -158,7 +170,7 @@ function VideoPostPage() {
                   {...layout}
                   form={form}
                   name="nest-messages"
-                  onFinish={onFinish}
+                  onFinish={handleAddVideo}
                   validateMessages={validateMessages}
                 >
                   <Form.Item
@@ -185,44 +197,33 @@ function VideoPostPage() {
                 </Form>
               </Modal>
             </Menu>
-            {loading ? (
-              //   <div style={{ fontWeight: 700, fontSize: 48 }}>LOADING...</div>
-              // ) : (
-              //   <ul>
-              //     {postContents.map((content) => {
-              //       return <li>{content.title}</li>
-              //     })}
-              //   </ul>
-              // )}
 
-              <div style={{ fontWeight: 700, fontSize: 48 }}>LOADING...</div>
-            ) : (
-              <Row className="video-card-container">
-                {postVideo.map((video) => {
-                  return (
-                    <div className="video-card">
-                      <CloseOutlined
-                        key="setting"
-                        onClick={function () {
-                          console.log('hellox')
+            <Row className="video-card-container">
+              {postVideo.map((video) => {
+                return (
+                  <div className="video-card">
+                    <CloseOutlined
+                      key="setting"
+                      onClick={function () {
+                        console.log('hellox')
 
-                          handleDeletePostVideo(video.id)
-                        }}
-                      />
-                      <YouTube
-                        className="content-image"
-                        videoId={video.link.split('=')[1]}
-                      />
-                      <div className="content-title">
-                        <p>
-                          <strong>{video.title}</strong>
-                        </p>
-                      </div>
+                        handleDeletePostVideo(video.id)
+                      }}
+                    />
+                    {/* {JSON.stringify(video)} */}
+                    <YouTube
+                      className="content-image"
+                      videoId={video?.link?.split('?v=')[1]}
+                    />
+                    <div className="content-title">
+                      <p>
+                        <strong>{video.title}</strong>
+                      </p>
                     </div>
-                  )
-                })}
-              </Row>
-            )}
+                  </div>
+                )
+              })}
+            </Row>
           </Content>
         </Layout>
       </VideoPageWrapped>
